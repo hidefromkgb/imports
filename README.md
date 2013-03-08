@@ -24,7 +24,8 @@ D beginning from zero character is treated as ending mark. Technically, the name
 Each <i>L</i>-th address in resulting <i>prc</i> table corresponds to the function whose name is encoded with <i>L</i>-th hash in hash table.
 
 The very first segment is presumed to contain hashes of functions to be loaded from <i>KERNEL32</i>, so this segment cannot have a <i>D</i> member, so it begins immediately with <i>K</i>.<br>
-This segment MUST contain the hash for <i>LoadLibrary()</i>, and the resulting table must reserve a position for it, since it is necessary for further DLL loading. Even if no library except <i>KERNEL32</i> is used, it still has to be present. Alternatively, the call itself may wiped out from the algo; you decide.
+This segment MUST contain the hash for <i>LoadLibrary()</i>, and the resulting table must reserve a position for it, since it is necessary for further DLL loading. Even if no library except <i>KERNEL32</i> is used, it still has to be present. Alternatively, the call itself may wiped out from the algo; you decide.<br>
+FIX: Windows 7 and upper do not load <i>KERNEL32</i> immediately after program start, thus making <i>LoadLibraryA()</i> unaccessible. Fortunately, <i>LoadLibraryExA()</i> is still available, so the algo now uses it instead.
 
 <br>P.S.:<br>
 Each possible initializing vector for a 16-bit linear hash, (API_MULT; API_PLUS), results in the hash having a number of collisions.<br>

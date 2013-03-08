@@ -7,8 +7,9 @@ include \masm32\include\windows.inc;
 
 
 ;const
-  ; <-- kernel32.dll (has to be first!)
-  LoadLibraryA           equ  DWORD PTR [prc + 000]; <-- compulsory!
+  LoadLibraryExA         equ  DWORD PTR [prc + 000]; <-- compulsory!
+
+  ; <-- kernel32.dll
   LoadResource           equ  DWORD PTR [prc + 004];
   FindResourceA          equ  DWORD PTR [prc + 008];
   GetLocalTime           equ  DWORD PTR [prc + 012];
@@ -65,9 +66,11 @@ include \masm32\include\windows.inc;
 
 
 .code
-  TBL DB (@F - $)/2;          <-- N.B.: "kernel32.dll\0" is absent!
-      DW 020AEh, 04504h, 04BE5h, 08F0Eh, 0C675h, 0EB2Bh;
-      DW 0FD6Ah;
+  TBL DB (@F - $)/2;
+      DW 0CD35h;
+  @@:
+      DB "kernel32.dll", 0, (@F - $)/2;
+      DW 04504h, 04BE5h, 08F0Eh, 0C675h, 0EB2Bh, 0FD6Ah;
   @@:
       DB "user32.dll", 0, (@F - $)/2;
       DW 0011Ah, 0056Bh, 00D14h, 017DCh, 02DD4h, 031F3h;
@@ -180,8 +183,10 @@ include \masm32\include\windows.inc;
     MOV ESI, EDI;
     XOR EAX, EAX;
     REPNE SCASB;
+    PUSH EAX;
+    PUSH EAX;
     PUSH ESI;
-    CALL LoadLibraryA;
+    CALL LoadLibraryExA;
     TEST EAX, EAX;
   JNE @flib;
 
