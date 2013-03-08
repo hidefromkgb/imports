@@ -98,11 +98,17 @@ include \masm32\include\windows.inc;
   PUSH EDI;
   REP STOSD;
   MOV EDI, OFFSET TBL;
+
   MOV EAX, DWORD PTR FS:[EAX + 48];
-  MOV EAX, DWORD PTR [EAX + 12];
-  MOV ESI, DWORD PTR [EAX + 28];
-  LODSD;
-  MOV EAX, DWORD PTR [EAX + 8];
+  TEST EAX, EAX;
+  JS @F;
+    MOV EAX, DWORD PTR [EAX + 12];
+    MOV ESI, DWORD PTR [EAX + 28];
+    LODSD;
+    MOV EAX, DWORD PTR [EAX + 8];
+    JMP @flib;
+  @@:
+    MOV EAX, 0BFF70000h;
 
   @flib:
     MOV EDX, (IMAGE_DOS_HEADER PTR [EAX]).e_lfanew;
