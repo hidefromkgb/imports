@@ -21,7 +21,7 @@ Segment structure (not including first segment which is discussed later) is as f
 
 D beginning from zero character is treated as ending mark. Technically, the name of any file unable to be loaded as DLL (or simply nonexistent) will behave similarly, but zero char is more convenient as I consider.
 
-Each <i>I</i>-th address in resulting <i>prc</i> table corresponds to the function whose name is encoded with <i>I</i>-th hash in hash table.
+Each <i>L</i>-th address in resulting <i>prc</i> table corresponds to the function whose name is encoded with <i>L</i>-th hash in hash table.
 
 The very first segment is presumed to contain hashes of functions to be loaded from <i>KERNEL32</i>, so this segment cannot have a <i>D</i> member, so it begins immediately with <i>K</i>.<br>
 This segment MUST contain the hash for <i>LoadLibrary()</i>, and the resulting table must reserve a position for it, since it is necessary for further DLL loading. Even if no library except <i>KERNEL32</i> is used, it still has to be present. Alternatively, the call itself may wiped out from the algo; you decide.
@@ -48,4 +48,6 @@ OPENGL32:<br>
 So, check your function set carefully!
 
 <br>P.P.S.:<br>
+The actual function set provided in this example does not bear a particular purpose, and is intended only for demonstration.
+
 After I finally manage to get rid of the nasty access violation bug, I plan to post a program that facilitates hash table creation, based on the function set you provide.
