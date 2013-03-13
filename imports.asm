@@ -104,13 +104,16 @@ include \masm32\include\windows.inc;
   JS @F;
     MOV EAX, DWORD PTR [EAX + 12];
     MOV ESI, DWORD PTR [EAX + 28];
+  @flib:
     LODSD;
+    PUSH EAX;
     MOV EAX, DWORD PTR [EAX + 8];
-    JMP @flib;
+    JMP @flok;
   @@:
     MOV EAX, 0BFF70000h;
+    PUSH EAX;
 
-  @flib:
+  @flok:
     MOV EDX, (IMAGE_DOS_HEADER PTR [EAX]).e_lfanew;
     MOV EDX, (IMAGE_NT_HEADERS PTR [EAX + EDX]).OptionalHeader.\
     DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
@@ -169,7 +172,7 @@ include \masm32\include\windows.inc;
       MOVZX EAX, WORD PTR [EBX];
       MOV EAX, DWORD PTR [EBP + EAX*4];
       ADD EAX, DWORD PTR [ESP + 4];
-      MOV EDX, DWORD PTR [ESP + 8];
+      MOV EDX, DWORD PTR [ESP + 12];
       MOV DWORD PTR [EDX + ESI*2], EAX;
 
     @load:
@@ -180,26 +183,40 @@ include \masm32\include\windows.inc;
       DEC ECX;
     JGE @ldok;
 
-    POP EDX;
+    POP ESI;
+    POP ESI;
+    MOV EBX, LoadLibraryExA;
+    TEST EBX, EBX;
+    JE @flib;
+
     POP EDX;
     MOVZX EAX, BYTE PTR [EDI];
     LEA EDX, [EDX + EAX*4];
-    PUSH EDX;
     LEA EDI, [EDI + EAX*2 + 1];
+    PUSH EDX;
+    PUSH ESI;
     MOV ESI, EDI;
     XOR EAX, EAX;
     REPNE SCASB;
+
     PUSH EAX;
     PUSH EAX;
     PUSH ESI;
-    CALL LoadLibraryExA;
+    CALL EBX;
     TEST EAX, EAX;
-  JNE @flib;
+  JNE @flok;
 
+  POP EBP;
   POP EBP;
   POP EBP;
 
   ; <-- main code starts from here...
+
+  PUSH MB_OK or MB_ICONEXCLAMATION;
+  PUSH EAX;
+  PUSH OFFSET TBL + 3;
+  PUSH EAX;
+  CALL MessageBoxA;
 
   RET;
 

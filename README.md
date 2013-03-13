@@ -25,7 +25,8 @@ Each <i>L</i>-th address in resulting <i>prc</i> table corresponds to the functi
 
 The very first segment is presumed to contain hashes of functions to be loaded from <i>KERNEL32</i>, so this segment cannot have a <i>D</i> member, so it begins immediately with <i>K</i>.<br>
 This segment MUST contain the hash for <i>LoadLibrary()</i>, and the resulting table must reserve a position for it, since it is necessary for further DLL loading. Even if no library except <i>KERNEL32</i> is used, it still has to be present. Alternatively, the call itself may wiped out from the algo; you decide.<br>
-FIX: Windows 7 and upper do not load <i>KERNEL32</i> immediately after program start, thus making <i>LoadLibraryA()</i> unaccessible. Fortunately, <i>LoadLibraryExA()</i> is still available, so the algo now uses it instead.
+FIX: Windows 7 and upper do not load <i>KERNEL32</i> immediately after program start, thus making <i>LoadLibraryA()</i> unaccessible. Fortunately, <i>LoadLibraryExA()</i> is still available, so the algo now uses it instead.<br>
+FIX: WINE does load <i>KERNEL32</i> into our address space, but places it at the end of the libraries list, so we now try to find <i>LoadLibraryExA()</i> in every library present in the list, not only the first. If none of the loaded libraries contains this API (which is generally nonsense, but nonetheless), the program will eventually segfault at a zero address.
 
 <br>P.S.:<br>
 Each possible initializing vector for a 16-bit linear hash, (API_MULT; API_PLUS), results in the hash having a number of collisions.<br>
